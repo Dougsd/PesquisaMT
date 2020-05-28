@@ -1,0 +1,147 @@
+import React, { Component } from 'react';
+import { Platform, StyleSheet, Text, View, Alert, Dimensions, TouchableOpacity  } from 'react-native';
+import MapView, { Marker, Polyline } from 'react-native-maps';
+import { styles, memapstyle } from './Styles.js';
+
+const { width, height } = Dimensions.get('window')
+const SCREEN_HEIGHT = height
+const SCREEN_WIDTH = width
+const ASPECT_RATIO = width / height
+const LATTITUDE_DELTA = 0.0922
+const LONGTITUDE_DELTA = LATTITUDE_DELTA * ASPECT_RATIO
+const GOOGLE_MAPS_APIKEY = 'AIzaSyCX89ExEojs6s9DL6RsfhwknbTsPKdgGhU';
+
+
+function getCoords() {
+	Coords = [
+		{latitude: - 15.065157, longitude: -57.178883},
+		{latitude: - 15.064046, longitude: -57.173432},
+		{latitude: - 15.063228, longitude: -57.173968},
+		{latitude: - 15.060358, longitude: -57.173979},
+		{latitude: - 15.061819, longitude: -57.176693},
+		{latitude: - 15.063416, longitude: -57.179788},
+		{latitude: - 15.064216, longitude: -57.180006},
+		{latitude: - 15.065086, longitude: -57.179985},
+		{latitude: - 15.065231, longitude: -57.178923}
+    ]
+    return (Coords)
+}
+
+export default class App extends Component  {
+	constructor(props) {
+		
+		super(props)
+		this.state = {
+			initialPosition: {
+				latitude: 0,
+				longitude: 0,
+				latitudeDelta: 0,
+				longitudeDelta: 0
+			},
+
+			markerPosition: {
+				latitude: 0,
+				longitude: 0
+			},
+
+			marker: {
+				latitude: -15.065115,
+				longitude: -57.178835
+			}
+
+
+
+		};
+		
+	}
+	
+
+
+	getLocation() {
+		navigator.geolocation.getCurrentPosition((position) => {
+			//Aqui captura os dados latitude e longitude
+			//converte para tipo float
+			var long = parseFloat(position.coords.longitude)
+			var lati = parseFloat(position.coords.latitude)
+			// Cria um objeto temporarrio para enserir em state
+			var initialRegion = {
+				latitude: lati,
+				longitude: long,
+				latitudeDelta: LATTITUDE_DELTA,
+				longitudeDelta: LONGTITUDE_DELTA
+
+			}
+			//Seta os dados nos objetos de state
+			
+			this.setState({ initialPosition: initialRegion })
+			this.setState({ markerPosition: initialRegion })
+		},
+
+			error => Alert.alert(error.title, error.message, null, null),
+			{ enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+		)
+
+		//setInterval(this.getLocation(), 5000)
+	}
+
+
+
+
+
+	render() {
+		//setInterval(, 5000)
+		return (
+			<View style={styles.container}>
+				<MapView
+					customMapStyle={memapstyle}
+					style={styles.map}
+					region={this.state.initialPosition}
+					
+				>
+
+					<MapView.Marker coordinate={this.state.markerPosition}>
+
+						<View style={styles.radius}>
+							<View style={styles.marker}>
+
+							</View>
+
+						</View>
+
+
+
+
+					</MapView.Marker>
+
+					<Marker
+						coordinate={this.state.marker}
+						title={'Praca'}
+
+					/>
+
+
+
+					<Polyline
+						coordinates={getCoords()}
+						strokeColor="#FF00FF"
+						strokeColors={[
+							'#7F0000',
+							'#00000000' 
+						]}
+						strokeWidth={6}
+					/>
+
+
+
+
+
+				</MapView>
+                
+
+            </View>
+        );
+    }
+
+}
+
+
